@@ -68,9 +68,13 @@ class UndoRedoManagerTest {
 
     @Test
     fun `undo de substituicao restaura removido`() {
+        // Em produção, record() é chamado pelo TextWatcher DEPOIS da edição aplicada:
+        // o buffer já reflete "1" → "42". Simulamos exatamente esse estado aqui.
         val b = buffer("int x = 1;")
+        b.delete(8, 9)
+        b.insert(8, "42")
+        assertEquals("int x = 42;", b.toString())
         val m = UndoRedoManager()
-        // substitui "1" por "42"
         m.record(8, "1", "42")
         assertTrue(m.undo(b))
         assertEquals("int x = 1;", b.toString())

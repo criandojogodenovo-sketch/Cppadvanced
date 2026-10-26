@@ -86,6 +86,11 @@ object ZipUtils {
         } catch (e: IOException) {
             return ExtractResult.Failed("Erro de leitura: ${e.message}")
         }
+        // ZipInputStream devolve 0 entradas para dados que não são ZIP (não lança
+        // exceção) — um arquivo sem entradas é inválido para importação de projeto.
+        if (entries == 0) {
+            return ExtractResult.Failed("ZIP vazio ou inválido")
+        }
         return ExtractResult.Success(entries)
     }
 

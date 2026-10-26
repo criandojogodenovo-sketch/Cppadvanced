@@ -67,6 +67,7 @@ class UndoRedoManager(private val limit: Int = 200) {
         if (last != null &&
             removed.isEmpty() && last.removed.isEmpty() &&
             inserted.length == 1 && last.inserted.length >= 1 &&
+            inserted != "\n" &&                    // nova linha nunca se agrupa (nova operação)
             last.start + last.inserted.length == start &&
             now - last.timestamp <= mergeWindowMs &&
             '\n' !in last.inserted

@@ -39,8 +39,12 @@ object SafePath {
      */
     fun resolveInside(base: File, relative: String): File? {
         if (relative.contains('\u0000')) return null
+        val r = relative.trim()
+        // Caminhos absolutos são recusados: apenas caminhos relativos à base são aceites.
+        // (o trimStart('/') antigo transformava "/etc/passwd" em "etc/passwd" — risco de traversal)
+        if (r.startsWith("/") || r.startsWith("\\")) return null
         val baseCanonical = base.canonicalFile
-        val candidate = File(baseCanonical, relative.trimStart('/', '\\'))
+        val candidate = File(baseCanonical, r)
         val candidateCanonical = try {
             candidate.canonicalFile
         } catch (_: Exception) {
