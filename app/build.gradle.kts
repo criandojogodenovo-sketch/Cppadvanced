@@ -1,3 +1,5 @@
+import java.io.File
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -28,9 +30,9 @@ android {
             // Assinatura: usa segredos de CI se existirem (docs/BUILD.md),
             // caso contrário assina com a chave debug para permitir instalação em testes.
             val ksPath = System.getenv("STUDIO_KEYSTORE_PATH")
-            if (ksPath != null && java.io.File(ksPath).exists()) {
+            if (!ksPath.isNullOrBlank() && File(ksPath).exists()) {
                 signingConfig = signingConfigs.create("ciRelease") {
-                    storeFile = java.io.File(ksPath)
+                    storeFile = File(ksPath)
                     storePassword = System.getenv("STUDIO_KEYSTORE_PASSWORD")
                     keyAlias = System.getenv("STUDIO_KEY_ALIAS")
                     keyPassword = System.getenv("STUDIO_KEY_PASSWORD")
