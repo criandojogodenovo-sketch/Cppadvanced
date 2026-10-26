@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_new_file"
+        android:icon="@drawable/ic_file_add"
+        android:title="@string/new_file"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_new_folder"
+        android:icon="@drawable/ic_folder_add"
+        android:title="@string/new_folder"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search"
+        android:title="@string/search_files"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_import_zip"
+        android:title="@string/import_zip"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_export_zip"
+        android:title="@string/export_zip"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_project_settings"
+        android:title="@string/project_settings"
+        app:showAsAction="never" />
+</menu>

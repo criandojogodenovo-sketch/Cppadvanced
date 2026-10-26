@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">C++ Mobile Studio</string>
+    <string name="app_subtitle">IDE C/C++ offline-first para Android</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Projetos</string>
+    <string name="new_project">Novo projeto</string>
+    <string name="open_folder">Abrir pasta (SAF)</string>
+    <string name="settings">Definições</string>
+    <string name="docs">Documentação</string>
+    <string name="console_status">Estado da toolchain</string>
+    <string name="no_projects">Ainda não existem projetos.\nToca em \"Novo projeto\" para começar.</string>
+    <string name="recent_projects">Recentes</string>
+    <string name="external_projects">Pastas externas (SAF)</string>
+    <string name="remove_from_list">Remover da lista</string>
+    <string name="project_count">%1$d projeto(s) · %2$s livres</string>
+
+    <!-- Novo projeto -->
+    <string name="project_name">Nome do projeto</string>
+    <string name="project_template">Template</string>
+    <string name="create">Criar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="invalid_project_name">Nome inválido: usa letras, números, hífen ou underscore (sem espaços no início/fim).</string>
+    <string name="project_exists">Já existe um projeto com esse nome.</string>
+    <string name="project_created">Projeto criado</string>
+
+    <!-- Editor -->
+    <string name="editor_save">Guardar</string>
+    <string name="editor_saved">Guardado</string>
+    <string name="editor_unsaved_title">Alterações não guardadas</string>
+    <string name="editor_unsaved_dot">•</string>
+    <string name="undo">Desfazer</string>
+    <string name="redo">Refazer</string>
+    <string name="find_replace">Pesquisar e substituir</string>
+    <string name="font_increase">Aumentar letra</string>
+    <string name="font_decrease">Diminuir letra</string>
+    <string name="go_to_line">Ir para linha</string>
+    <string name="toggle_highlight">Alternar realce de sintaxe</string>
+    <string name="line_number">Linha</string>
+    <string name="invalid_line">Linha inválida</string>
+    <string name="large_file_warning">Ficheiro grande: realce de sintaxe desativado para manter a fluidez.</string>
+    <string name="recover_dialog_title">Recuperar alterações não guardadas?</string>
+    <string name="recover_dialog_msg">Foi encontrada uma recuperação automática mais recente do que o ficheiro guardado (de %1$s). Queres restaurá-la?</string>
+    <string name="restore">Restaurar</string>
+    <string name="discard">Descartar</string>
+    <string name="file_saved_toast">Ficheiro guardado</string>
+    <string name="save_failed">Falha ao guardar: %1$s</string>
+    <string name="read_only_file">Ficheiro só de leitura</string>
+
+    <!-- Pesquisa e substituição -->
+    <string name="find_hint">Pesquisar</string>
+    <string name="replace_hint">Substituir por</string>
+    <string name="case_sensitive">Maiúsculas/minúsculas</string>
+    <string name="whole_word">Palavra completa</string>
+    <string name="use_regex">Expressão regular</string>
+    <string name="match_count">%1$d ocorrência(s)</string>
+    <string name="no_matches">Sem ocorrências</string>
+    <string name="replaced_count">%1$d substituição(ões)</string>
+    <string name="invalid_regex">Expressão regular inválida</string>
+    <string name="replace_one">Substituir</string>
+    <string name="replace_all">Substituir tudo</string>
+
+    <!-- Explorador -->
+    <string name="explorer_title">Ficheiros</string>
+    <string name="new_file">Novo ficheiro</string>
+    <string name="new_folder">Nova pasta</string>
+    <string name="import_zip">Importar ZIP</string>
+    <string name="export_zip">Exportar ZIP</string>
+    <string name="search_files">Pesquisar</string>
+    <string name="search_by_name">Por nome</string>
+    <string name="search_by_content">Por conteúdo</string>
+    <string name="search_hint_name">Nome do ficheiro</string>
+    <string name="search_hint_content">Texto a procurar nos ficheiros</string>
+    <string name="search_running">A pesquisar…</string>
+    <string name="search_results">%1$d resultado(s)</string>
+    <string name="search_empty">Sem resultados</string>
+    <string name="open">Abrir</string>
+    <string name="rename">Renomear</string>
+    <string name="duplicate">Duplicar</string>
+    <string name="copy_path">Copiar caminho</string>
+    <string name="delete">Eliminar</string>
+    <string name="delete_confirm_title">Confirmar eliminação</string>
+    <string name="delete_confirm_msg">Eliminar permanentemente \"%1$s\"? Esta ação não pode ser anulada.</string>
+    <string name="name_already_exists">Já existe um item com esse nome.</string>
+    <string name="invalid_name">Nome inválido</string>
+    <string name="operation_done">Operação concluída</string>
+    <string name="operation_failed">Falhou: %1$s</string>
+    <string name="up_folder">Pasta anterior</string>
+    <string name="items_count">%1$d itens</string>
+    <string name="zip_imported">ZIP importado</string>
+    <string name="zip_invalid">ZIP inválido ou inseguro (caminhos suspeitos ou demasiado grande).</string>
+    <string name="path_copied">Caminho copiado</string>
+    <string name="project_settings">Definições do projeto</string>
+    <string name="file_size_unknown">—</string>
+
+    <!-- Consola / toolchain -->
+    <string name="console_title">Consola e toolchain</string>
+    <string name="toolchain_status">Estado real da toolchain neste dispositivo</string>
+    <string name="toolchain_not_bundled">Não incluída nesta build</string>
+    <string name="toolchain_pending">Previsto na ETAPA 4 — ver docs/TOOLCHAIN-STRATEGY.md</string>
+    <string name="build_history">Histórico de builds</string>
+    <string name="no_builds">Ainda não há builds registadas.</string>
+    <string name="compile_btn">Compilar</string>
+    <string name="compile_unavailable_title">Compilação local indisponível</string>
+    <string name="compile_unavailable_msg">A toolchain C/C++ local ainda não está incluída nesta build (prevista na ETAPA 4). A estratégia técnica está documentada em docs/TOOLCHAIN-STRATEGY.md. Nada foi simulado: esta é a verdadeira disponibilidade do dispositivo.</string>
+    <string name="open_toolchain_docs">Ver estratégia da toolchain</string>
+
+    <!-- Definições -->
+    <string name="appearance">Aparência</string>
+    <string name="theme_mode">Tema</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_dark">Escuro</string>
+    <string name="theme_light">Claro</string>
+    <string name="editor_prefs">Editor</string>
+    <string name="font_size">Tamanho da letra (sp)</string>
+    <string name="autosave">Guardamento automático</string>
+    <string name="autosave_summary">Guarda o ficheiro aberto 30 s após a última alteração</string>
+    <string name="syntax_highlight">Realce de sintaxe</string>
+    <string name="syntax_summary">Desativa em ficheiros muito grandes automaticamente</string>
+    <string name="storage">Armazenamento</string>
+    <string name="clear_recents">Limpar lista de recentes</string>
+    <string name="recents_cleared">Lista limpa</string>
+    <string name="about">Sobre</string>
+    <string name="version_label">Versão</string>
+
+    <!-- Docs -->
+    <string name="docs_title">Documentação integrada</string>
+
+    <!-- Definições de projeto -->
+    <string name="project_settings_title">Definições do projeto</string>
+    <string name="cpp_standard">Padrão C++</string>
+    <string name="build_system">Sistema de build</string>
+    <string name="save_changes">Guardar alterações</string>
+    <string name="project_info">Informação</string>
+    <string name="missing_requirements">Requisitos em falta</string>
+    <string name="req_compiler">Compilador local (ETAPA 4)</string>
+    <string name="req_cmake">CMake local (ETAPA 5)</string>
+
+    <!-- Genéricos -->
+    <string name="ok">OK</string>
+    <string name="yes">Sim</string>
+    <string name="no">Não</string>
+    <string name="close">Fechar</string>
+    <string name="error">Erro</string>
+    <string name="loading">A carregar…</string>
+</resources>

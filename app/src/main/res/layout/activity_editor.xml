@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_color">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/bg_color"
+        app:titleTextColor="@color/text_c"
+        app:subtitleTextColor="@color/text2_c" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.cppmobilestudio.app.editor.CodeEditorView
+            android:id="@+id/editor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/bg_color"
+            android:gravity="top"
+            android:imeOptions="flagNoExtractUi|flagNoFullscreen"
+            android:inputType="textMultiLine|textNoSuggestions"
+            android:textColorHighlight="#33FF8C42"
+            android:textCursorDrawable="@null"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/warningBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="@color/warning_yellow"
+            android:padding="8dp"
+            android:text="@string/large_file_warning"
+            android:textColor="#0C0C0E"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface_color"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/symbolBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symTab" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="→" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symSemi" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=";" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symLBrace" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="{" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symRBrace" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="}" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symLParen" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="(" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symRParen" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=")" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symLAngle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&lt;" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symRAngle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&gt;" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symHash" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="#" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symQuote" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&quot;" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symApostrophe" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\'" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symBackslash" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\\" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symEquals" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="=" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symAmp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&amp;" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symStar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="*" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symArrow" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-&gt;" />
+            <Button style="@style/Widget.CppStudio.SymbolButton" android:id="@+id/symColonColon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="::" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+</LinearLayout>

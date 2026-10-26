@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_save"
+        android:icon="@drawable/ic_save"
+        android:title="@string/editor_save"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_undo"
+        android:icon="@drawable/ic_undo"
+        android:title="@string/undo"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_redo"
+        android:icon="@drawable/ic_redo"
+        android:title="@string/redo"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_find"
+        android:icon="@drawable/ic_search"
+        android:title="@string/find_replace"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_compile"
+        android:icon="@drawable/ic_play"
+        android:title="@string/compile_btn"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_font_increase"
+        android:title="@string/font_increase"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_font_decrease"
+        android:title="@string/font_decrease"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_go_to_line"
+        android:title="@string/go_to_line"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_toggle_highlight"
+        android:title="@string/toggle_highlight"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_project_settings"
+        android:title="@string/project_settings"
+        app:showAsAction="never" />
+</menu>

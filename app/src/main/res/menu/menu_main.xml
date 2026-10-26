@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_open_folder"
+        android:icon="@drawable/ic_folder_open"
+        android:title="@string/open_folder"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_console"
+        android:icon="@drawable/ic_terminal"
+        android:title="@string/console_status"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_docs"
+        android:icon="@drawable/ic_doc"
+        android:title="@string/docs"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/settings"
+        app:showAsAction="never" />
+</menu>
