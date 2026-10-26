@@ -1,0 +1,49 @@
+name: Android CI (testes + APK debug)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Testes unitários + APK debug
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gradle (com cache)
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Permissões do wrapper
+        run: chmod +x gradlew
+
+      - name: Testes unitários
+        run: ./gradlew :app:testDebugUnitTest --stacktrace
+
+      - name: Relatórios de teste (se falhar)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: app/build/reports/tests/
+          if-no-files-found: ignore
+
+      - name: APK debug
+        run: ./gradlew :app:assembleDebug --stacktrace
+
+      - name: Publicar APK debug
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
