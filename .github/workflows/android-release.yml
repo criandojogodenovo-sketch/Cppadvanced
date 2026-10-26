@@ -33,29 +33,36 @@ jobs:
       - name: Testes unitários
         run: ./gradlew :app:testDebugUnitTest --stacktrace
 
-      # Assinatura de PRODUÇÃO (opcional): usa segredos se existirem — docs/BUILD.md
-      - name: Descodificar keystore de produção
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+      # Assinatura: usa keystore de PRODUÇÃO dos segredos se existirem (docs/BUILD.md);
+      # caso contrário gera keystore de CI — APK instalável para testes.
+      # Nota: contexto `secrets` não é permitido em `if:` de steps (workflow inválido),
+      # por isso a decisão é feita aqui dentro, via env.
+      - name: Preparar keystore (produção via segredos, ou CI)
         env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
-          echo "STUDIO_KEYSTORE_PATH=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
-          echo "STUDIO_KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
-          echo "STUDIO_KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> "$GITHUB_ENV"
-          echo "STUDIO_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> "$GITHUB_ENV"
-
-      # Sem segredos: keystore de CI gerado no momento — APK instalável para testes
-      - name: Gerar keystore de CI
-        if: ${{ secrets.KEYSTORE_BASE64 == '' }}
-        run: |
-          mkdir -p "$HOME/.android"
-          keytool -genkeypair -v \
-            -keystore "$HOME/.android/debug.keystore" \
-            -storepass android -keypass android \
-            -alias androiddebugkey -keyalg RSA -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Cpp Mobile Studio CI, OU=CI, O=CppStudio, L=Luanda, C=AO"
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            {
+              echo "STUDIO_KEYSTORE_PATH=$RUNNER_TEMP/release.keystore"
+              echo "STUDIO_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+              echo "STUDIO_KEY_ALIAS=$KEY_ALIAS"
+              echo "STUDIO_KEY_PASSWORD=$KEY_PASSWORD"
+            } >> "$GITHUB_ENV"
+            echo "A usar keystore de PRODUÇÃO (segredos do repositório)"
+          else
+            mkdir -p "$HOME/.android"
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android \
+              -alias androiddebugkey -keyalg RSA -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Cpp Mobile Studio CI, OU=CI, O=CppStudio, L=Luanda, C=AO"
+            echo "Sem segredos de produção — gerado keystore de CI (APK para testes)"
+          fi
 
       - name: Compilar APK debug + release
         run: ./gradlew :app:assembleDebug :app:assembleRelease --stacktrace
