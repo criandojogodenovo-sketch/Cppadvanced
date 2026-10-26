@@ -52,6 +52,8 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        // BuildConfig.VERSION_NAME usado em SettingsActivity (AGP 8 desativa por defeito)
+        buildConfig = true
     }
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"

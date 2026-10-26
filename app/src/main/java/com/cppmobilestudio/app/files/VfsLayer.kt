@@ -160,10 +160,9 @@ class LocalVfs(private val guardRoot: File) : Vfs {
     }
 
     override fun rootLabel(node: VNode): String {
-        return when {
-            node.file.canonicalPath == guardRoot.canonicalFile.path -> "Projetos"
-            else -> node.displayName()
-        }
+        val f = (node as? VNode.Local)?.file
+        return if (f != null && f.canonicalPath == guardRoot.canonicalFile.path) "Projetos"
+        else node.displayName()
     }
 }
 
@@ -196,7 +195,10 @@ class SafVfs(private val context: Context) : Vfs {
         return cur
     }
 
-    private fun saf(node: VNode): DocumentFile? = resolve(node as? VNode.Saf ?: return null)
+    private fun saf(node: VNode): DocumentFile? {
+        val s = node as? VNode.Saf ?: return null
+        return resolve(s)
+    }
 
     override fun list(dir: VNode): List<VEntry> {
         val d = saf(dir) ?: return emptyList()
@@ -238,7 +240,7 @@ class SafVfs(private val context: Context) : Vfs {
         if (d.findFile(name) != null) return null
         val mime = if (name.endsWith(".zip")) "application/zip" else "text/plain"
         val created = d.createFile(mime, name) ?: return null
-        return VNode.Saf(dir as VNode.Saf, (dir.relativePath.trim('/') + "/" + name).replace("//", "/"))
+        return VNode.Saf((dir as VNode.Saf).treeUri, (dir.relativePath.trim('/') + "/" + name).replace("//", "/"))
             .takeIf { resolve(it) != null } ?: run {
             // fallback: devolve o nó construído mesmo se resolve falhar (alguns providers demoram)
             VNode.Saf((dir as VNode.Saf).treeUri, (dir.relativePath.trim('/') + "/" + name))

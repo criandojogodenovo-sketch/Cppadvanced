@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cppmobilestudio.app.R
-import com.cppmobilestudio.app.build.ToolchainManager
+import com.cppmobilestudio.app.toolchain.ToolchainManager
 import com.cppmobilestudio.app.editor.CodeEditorActivity
 import com.cppmobilestudio.app.files.FileOps
 import com.cppmobilestudio.app.files.SafePath
@@ -88,7 +88,7 @@ class FileExplorerActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        navigateUp() || finish()
+        if (!navigateUp()) finish()
         return true
     }
 

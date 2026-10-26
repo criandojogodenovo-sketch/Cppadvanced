@@ -6,7 +6,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.cppmobilestudio.app.R
-import com.cppmobilestudio.app.build.ToolchainManager
+import com.cppmobilestudio.app.toolchain.ToolchainManager
 import com.cppmobilestudio.app.files.FileOps
 import com.google.android.material.appbar.MaterialToolbar
 import java.io.File

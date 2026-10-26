@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.cppmobilestudio.app.R
-import com.cppmobilestudio.app.build.ToolchainManager
+import com.cppmobilestudio.app.toolchain.ToolchainManager
 import com.cppmobilestudio.app.files.VNode
 import com.cppmobilestudio.app.files.Vfs
 import com.cppmobilestudio.app.files.VfsLayer
@@ -108,7 +108,7 @@ class CodeEditorActivity : AppCompatActivity() {
         val content = try {
             v.readText(n)
         } catch (e: Exception) {
-            Toast.makeText(this, e.message ?: R.string.error, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, e.message ?: getString(R.string.error), Toast.LENGTH_LONG).show()
             finish()
             return
         }

@@ -8,8 +8,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.cppmobilestudio.app.R
-import com.cppmobilestudio.app.build.BuildHistoryStore
-import com.cppmobilestudio.app.build.ToolchainManager
+import com.cppmobilestudio.app.toolchain.BuildHistoryStore
+import com.cppmobilestudio.app.toolchain.ToolchainManager
 import com.cppmobilestudio.app.docs.DocsActivity
 import com.google.android.material.appbar.MaterialToolbar
 import java.text.SimpleDateFormat
