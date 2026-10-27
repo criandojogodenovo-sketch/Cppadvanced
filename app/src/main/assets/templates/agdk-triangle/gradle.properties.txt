@@ -1,0 +1,11 @@
+# JVM para o Gradle — CI/telemóvel
+org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+
+org.gradle.parallel=true
+org.gradle.caching=true
+
+android.useAndroidX=true
+android.nonTransitiveRClass=true
+
+# NDK/CMake: compilar apenas o que precisamos
+android.native.buildOutput=verbose

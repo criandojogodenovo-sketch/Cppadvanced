@@ -33,7 +33,8 @@ object ToolchainManager {
         val clangAvailable = native?.let { File(it, CLANG_LIB).exists() } == true
         val cmakeAvailable = native?.let { File(it, CMAKE_LIB).exists() } == true
 
-        val pending = "Não incluída nesta build — previsto na ETAPA 4/5 (docs/TOOLCHAIN-STRATEGY.md)"
+        val pending = "A compilação local ainda NÃO existe (ETAPA 4/5). Usa “Compilar na nuvem” " +
+            "para este projeto — o APK real sai do GitHub Actions."
 
         return listOf(
             ToolchainStatus(

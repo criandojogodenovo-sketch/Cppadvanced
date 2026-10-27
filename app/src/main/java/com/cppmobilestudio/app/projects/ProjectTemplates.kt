@@ -1,5 +1,6 @@
 package com.cppmobilestudio.app.projects
 
+import android.content.Context
 import com.cppmobilestudio.app.files.FileOps
 import java.io.File
 
@@ -13,10 +14,11 @@ object ProjectTemplates {
         CPP_CONSOLE("Consola C++17 (main.cpp)"),
         CPP_CMAKE_MULTI("CMake multi-ficheiro (src/ + include/)"),
         CPP_STATIC_LIB("Biblioteca estática C++ (CMake)"),
-        C_SINGLE_FILE("Ficheiro único C (main.c)")
+        C_SINGLE_FILE("Ficheiro único C (main.c)"),
+        AGDK_TRIANGLE("Triângulo OpenGL ES 3.0 (AGDK) — projeto Android completo")
     }
 
-    fun materialize(project: Project, template: Template) {
+    fun materialize(project: Project, template: Template, context: Context) {
         val root = project.rootDir
         when (template) {
             Template.CPP_CONSOLE -> {
@@ -47,7 +49,86 @@ object ProjectTemplates {
                 File(root, "main.c").writeText(CONSOLE_MAIN_C, Charsets.UTF_8)
                 File(root, "README.md").writeText(readme(project.name, template), Charsets.UTF_8)
             }
+            Template.AGDK_TRIANGLE -> materializeAgdk(project, context)
         }
+    }
+
+    /**
+     * Projeto AGDK completo (GameActivity + native_app_glue + CMake + GLES 3.0),
+     * materializado a partir dos assets do app com substituição de variáveis.
+     * Inclui workflow de CI próprio (.github/workflows/build.yml) e gradle wrapper.
+     */
+    private fun materializeAgdk(project: Project, context: Context) {
+        val root = project.rootDir
+        val slug = agdkSlug(project.name)
+        val pkg = "com.cppstudio.$slug"
+        val pkgPath = pkg.replace('.', '/')
+        val subst = mapOf(
+            "{{PACKAGE}}" to pkg,
+            "{{PKG_PATH}}" to pkgPath,
+            "{{APP_LABEL}}" to project.name,
+            "{{LIB_NAME}}" to slug,
+            "{{PROJECT_NAME}}" to project.name
+        )
+
+        // asset (templates/agdk-triangle/…) → caminho no projeto gerado
+        val mapping = listOf(
+            "settings.gradle.kts.txt" to "settings.gradle.kts",
+            "root-build.gradle.kts.txt" to "build.gradle.kts",
+            "gradle.properties.txt" to "gradle.properties",
+            "gitignore.txt" to ".gitignore",
+            "readme.md.txt" to "README.md",
+            "workflow-build.yml.txt" to ".github/workflows/build.yml",
+            "app-build.gradle.kts.txt" to "app/build.gradle.kts",
+            "AndroidManifest.txt" to "app/src/main/AndroidManifest.xml",
+            "MainActivity.kt.txt" to "app/src/main/java/$pkgPath/MainActivity.kt",
+            "strings.txt" to "app/src/main/res/values/strings.xml",
+            "themes.txt" to "app/src/main/res/values/themes.xml",
+            "icon.xml.txt" to "app/src/main/res/drawable/ic_launcher_foreground.xml",
+            "CMakeLists.txt" to "app/src/main/cpp/CMakeLists.txt",
+            "main.cpp.txt" to "app/src/main/cpp/main.cpp",
+            "triangle.vert" to "app/src/main/assets/shaders/triangle.vert",
+            "triangle.frag" to "app/src/main/assets/shaders/triangle.frag",
+            "gradle-wrapper/gradlew.txt" to "gradlew",
+            "gradle-wrapper/gradlew.bat.txt" to "gradlew.bat",
+            "gradle-wrapper/gradle-wrapper.properties.txt" to "gradle/wrapper/gradle-wrapper.properties"
+        )
+
+        val assets = context.assets
+        for ((assetName, targetRel) in mapping) {
+            val target = File(root, targetRel)
+            if (!target.parentFile.exists()) target.parentFile.mkdirs()
+            if (assetName.endsWith(".jar")) {
+                assets.open("templates/agdk-triangle/$assetName").use { input ->
+                    target.outputStream().use { output -> input.copyTo(output) }
+                }
+            } else {
+                var text = assets.open("templates/agdk-triangle/$assetName")
+                    .readBytes().toString(Charsets.UTF_8)
+                for ((k, v) in subst) text = text.replace(k, v)
+                target.writeText(text, Charsets.UTF_8)
+            }
+        }
+
+        // gradlew precisa de bit executável (usado no CI Linux; no telemóvel é ignorado)
+        try {
+            java.io.File(root, "gradlew").setExecutable(true, false)
+        } catch (_: Exception) {
+        }
+
+        File(root, "README.md").appendText(
+            "\n---\n\nGerado pelo template AGDK do C++ Mobile Studio. " +
+            "Compilação local indisponível por agora (ETAPA 4) — usa “Compilar na nuvem”.\n"
+        )
+    }
+
+    /** Slug a-z0-9_ para package Java e alvo CMake (nunca começa por dígito). */
+    private fun agdkSlug(name: String): String {
+        val s = name.lowercase()
+            .map { if (it.isLetterOrDigit() && it.code < 128) it else '_' }
+            .joinToString("").trim('_')
+        val fixed = if (s.isEmpty() || s[0].isDigit()) "app_$s" else s
+        return fixed.take(30).ifBlank { "triangle" }
     }
 
     // ── Conteúdos ────────────────────────────────────────────────────────────

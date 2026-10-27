@@ -1,0 +1,55 @@
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+}
+
+android {
+    namespace = "{{PACKAGE}}"
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = "{{PACKAGE}}"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
+
+        // Primeiro alvo: ARM64 (a maioria dos telemóveis modernos)
+        ndk {
+            abiFilters += listOf("arm64-v8a")
+        }
+
+        externalNativeBuild {
+            cmake {
+                arguments += listOf("-DANDROID_STL=c++_shared")
+                cppFlags += listOf("-std=c++17", "-O2")
+            }
+        }
+    }
+
+    // GameActivity (AGDK) distribui código nativo via Prefab
+    buildFeatures {
+        prefab = true
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
+
+dependencies {
+    // AGDK GameActivity + native_app_glue (via Prefab)
+    implementation("androidx.games:games-activity:2.0.2")
+    implementation("androidx.core:core-ktx:1.13.1")
+}

@@ -63,6 +63,13 @@
             android:layout_height="wrap_content"
             android:text="Ficheiro único C (main.c)"
             android:textColor="@color/text_c" />
+
+        <RadioButton
+            android:id="@+id/tplAgdk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Triângulo OpenGL ES 3.0 (AGDK) — projeto Android completo (build na nuvem)"
+            android:textColor="@color/text_c" />
     </RadioGroup>
 
 </LinearLayout>

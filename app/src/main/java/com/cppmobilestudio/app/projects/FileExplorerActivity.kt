@@ -551,6 +551,15 @@ class FileExplorerActivity : AppCompatActivity() {
             R.id.action_search -> showSearchDialog()
             R.id.action_import_zip -> importZip()
             R.id.action_export_zip -> exportZip()
+            R.id.action_cloud_build -> {
+                if (projectName.isBlank()) {
+                    Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show()
+                } else {
+                    val i = Intent(this, com.cppmobilestudio.app.cloud.CloudBuildActivity::class.java)
+                    i.putExtra(EXTRA_PROJECT_NAME, projectName)
+                    startActivity(i)
+                }
+            }
             R.id.action_project_settings -> {
                 val i = Intent(this, ProjectSettingsActivity::class.java)
                 i.putExtra(EXTRA_PROJECT_NAME, projectName)

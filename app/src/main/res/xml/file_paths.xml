@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Caminhos partilháveis via FileProvider (APKs gerados na nuvem).
+     Os projetos vivem em getExternalFilesDir/projects/ → external-files-path. -->
+<paths>
+    <external-files-path name="cloud_builds" path="projects/" />
+    <files-path name="internal_projects" path="projects/" />
+</paths>

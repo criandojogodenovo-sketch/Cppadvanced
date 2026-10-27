@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.cppmobilestudio.app.R
+import com.cppmobilestudio.app.cloud.CloudBuildActivity
 import com.cppmobilestudio.app.toolchain.ToolchainManager
 import com.cppmobilestudio.app.files.VNode
 import com.cppmobilestudio.app.files.Vfs
@@ -227,11 +228,27 @@ class CodeEditorActivity : AppCompatActivity() {
     private fun showCompileUnavailable() {
         val st = ToolchainManager.status(this)
         val detail = st.joinToString("\n") { "• ${it.name}: ${if (it.available) "OK" else it.detail}" }
-        MaterialAlertDialogBuilder(this)
+
+        // Atalho para a nuvem: só faz sentido para ficheiros de projeto local
+        val localProject = (node as? VNode.Local)?.let {
+            com.cppmobilestudio.app.projects.ProjectRepository(this).projectOf(it.file)
+        }
+
+        val dialog = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.compile_unavailable_title)
             .setMessage(getString(R.string.compile_unavailable_msg) + "\n\n" + detail)
             .setPositiveButton(R.string.ok, null)
-            .show()
+        if (localProject != null) {
+            dialog.setNeutralButton(R.string.cloud_build_button) { _, _ ->
+                val i = Intent(this, CloudBuildActivity::class.java)
+                i.putExtra(
+                    com.cppmobilestudio.app.projects.FileExplorerActivity.EXTRA_PROJECT_NAME,
+                    localProject.name
+                )
+                startActivity(i)
+            }
+        }
+        dialog.show()
     }
 
     private fun changeFont(delta: Int) {

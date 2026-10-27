@@ -1,0 +1,23 @@
+package {{PACKAGE}}
+
+import android.os.Bundle
+import com.google.androidgamesdk.GameActivity
+
+/**
+ * Atividade de jogo (AGDK): delega o ecrã e o ciclo de vida ao código nativo
+ * (main.cpp) através do native_app_glue incluído no androidx.games:games-activity.
+ */
+class MainActivity : GameActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Sem setContentView: o GameActivity cria a superfície nativa (ANativeWindow)
+    }
+
+    companion object {
+        init {
+            // Carrega a biblioteca nativa (alvo do CMakeLists.txt)
+            System.loadLibrary("{{LIB_NAME}}")
+        }
+    }
+}

@@ -46,9 +46,11 @@ class ProjectRepository(private val context: Context) {
             language = if (template == ProjectTemplates.Template.C_SINGLE_FILE) "c" else "cpp",
             buildSystem = if (template == ProjectTemplates.Template.CPP_CMAKE_MULTI ||
                 template == ProjectTemplates.Template.CPP_STATIC_LIB
-            ) "cmake" else "single-files"
+            ) "cmake"
+            else if (template == ProjectTemplates.Template.AGDK_TRIANGLE) "gradle-agdk"
+            else "single-files"
         )
-        ProjectTemplates.materialize(project, template)
+        ProjectTemplates.materialize(project, template, context.applicationContext)
         project.save()
         touchRecent(project.name, local = true)
         return project

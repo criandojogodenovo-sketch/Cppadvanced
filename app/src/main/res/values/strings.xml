@@ -103,7 +103,7 @@
     <string name="no_builds">Ainda não há builds registadas.</string>
     <string name="compile_btn">Compilar</string>
     <string name="compile_unavailable_title">Compilação local indisponível</string>
-    <string name="compile_unavailable_msg">A toolchain C/C++ local ainda não está incluída nesta build (prevista na ETAPA 4). A estratégia técnica está documentada em docs/TOOLCHAIN-STRATEGY.md. Nada foi simulado: esta é a verdadeira disponibilidade do dispositivo.</string>
+    <string name="compile_unavailable_msg">A compilação LOCAL ainda NÃO existe nesta versão (chega na ETAPA 4, com clang embutido — docs/TOOLCHAIN-STRATEGY.md). Isto não é um defeito: é uma fase ainda não construída, e nada aqui é simulado.\n\nPara testar o projeto AGORA: usa “Compilar na nuvem” — o GitHub Actions compila o APK real e o app descarrega-o e instala-o.</string>
     <string name="open_toolchain_docs">Ver estratégia da toolchain</string>
 
     <!-- Definições -->
@@ -144,4 +144,41 @@
     <string name="close">Fechar</string>
     <string name="error">Erro</string>
     <string name="loading">A carregar…</string>
+
+    <!-- Build na nuvem (Fase 7) -->
+    <string name="cloud_build_title">Compilar na nuvem</string>
+    <string name="cloud_build_button">Compilar na nuvem</string>
+    <string name="cloud_build_menu">Compilar na nuvem…</string>
+    <string name="cloud_install_apk">Instalar APK</string>
+    <string name="cloud_open_repo">Abrir repo no GitHub</string>
+    <string name="cloud_repo_line">Repo: %1$s/%2$s</string>
+    <string name="cloud_status_idle">Pronto. O workflow do projeto compila arm64-v8a (APK debug) no GitHub Actions.</string>
+    <string name="cloud_status_validating">A validar token…</string>
+    <string name="cloud_status_apk_ready">APK descarregado — pronto a instalar (arm64-v8a, debug).</string>
+    <string name="cloud_build_ok">Build concluída com sucesso!</string>
+    <string name="cloud_build_failed">A build terminou com erros.</string>
+    <string name="cloud_log_hint">Log do CI (em falha, mostra os passos e o erro real do compilador):</string>
+    <string name="cloud_no_repo_yet">Compila primeiro — o repo é criado no primeiro build.</string>
+    <string name="install_failed">Falha ao instalar: %1$s. Verifica se autorizaste “instalar apps desconhecidas” para este app.</string>
+    <string name="cloud_explain">Este projeto é enviado para um repositório NO TEU GitHub (via API), o workflow dele compila o APK e o app descarrega o resultado. Requer Internet apenas para o build.</string>
+
+    <!-- Token GitHub (encriptado) -->
+    <string name="token_section">Token GitHub (encriptado)</string>
+    <string name="token_current">Token atual: %1$s</string>
+    <string name="token_hint">Cola aqui o token (ghp_… ou github_pat_…)</string>
+    <string name="token_dialog_title">Token de acesso do GitHub</string>
+    <string name="token_dialog_hint">O token fica guardado apenas NESTE telemóvel, encriptado (EncryptedSharedPreferences). Precisa de escopo "repo". O app usa-o para criar o repo do projeto e disparar o build.</string>
+    <string name="token_dialog_hint_field">Token (não é mostrado novamente)</string>
+    <string name="token_invalid">Token demasiado curto — verifica se copiaste bem.</string>
+    <string name="token_saved">Token guardado encriptado.</string>
+    <string name="token_deleted">Token apagado.</string>
+    <string name="token_test_ok">Token válido — utilizador: %1$s</string>
+    <string name="token_test_fail">Token recusado pelo GitHub (%1$s).</string>
+    <string name="token_save">Guardar</string>
+    <string name="token_test">Testar</string>
+    <string name="token_delete">Apagar</string>
+
+    <!-- Aviso honesto do "Executar" -->
+    <string name="run_not_local_title">Executar — não disponível localmente</string>
+    <string name="run_not_local_msg">A compilação LOCAL ainda NÃO existe (chega na ETAPA 4, com clang embutido). Isto não é um defeito do projeto: é uma fase ainda não construída.\n\nPara testar ESTE projeto agora, usa “Compilar na nuvem“ — o GitHub Actions cria o APK real e o app instala-o no telemóvel.</string>
 </resources>

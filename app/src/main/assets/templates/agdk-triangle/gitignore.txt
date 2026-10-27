@@ -1,0 +1,26 @@
+# .gitignore gerado pelo C++ Mobile Studio (projeto AGDK)
+# Builds e caches do Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# NDK / CMake
+.cxx/
+.externalNativeBuild/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Locais da máquina
+local.properties
+captures/
+
+# APKs locais (os oficiais saem do CI)
+*.apk
+!**/src/main/assets/**/*.apk
+
+# Sistemas
+.DS_Store
+Thumbs.db

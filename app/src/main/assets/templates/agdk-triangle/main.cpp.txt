@@ -1,0 +1,302 @@
+// ============================================================================
+//  Triângulo OpenGL ES 3.0 — projeto AGDK (GameActivity + native_app_glue)
+//  Gerado pelo C++ Mobile Studio.
+//
+//  Pipeline real: GameActivity (superfície nativa) → EGL (janela/contexto)
+//  → GLES 3.0 (VAO/VBO + shaders carregados dos assets) → eglSwapBuffers.
+//  Shaders em ficheiros separados: assets/shaders/triangle.vert / .frag
+// ============================================================================
+
+#include <android/log.h>
+#include <android/asset_manager.h>
+#include <game-activity/native_app_glue/android_native_app_glue.h>
+
+#include <EGL/egl.h>
+#include <GLES3/gl3.h>
+
+#include <string>
+
+#define LOG_TAG "TriangleES30"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,  LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
+// Compatibilidade com cabeçalhos EGL 1.4 (bit do ES3 veio via extensão KHR)
+#ifndef EGL_OPENGL_ES3_BIT
+#define EGL_OPENGL_ES3_BIT 0x00000040
+#endif
+
+// ── Estado do motor ─────────────────────────────────────────────────────────
+
+struct Engine {
+    struct android_app* app = nullptr;
+
+    EGLDisplay display = EGL_NO_DISPLAY;
+    EGLSurface surface = EGL_NO_SURFACE;
+    EGLContext context = EGL_NO_CONTEXT;
+
+    GLuint program = 0;
+    GLuint vao = 0;
+    GLuint vbo = 0;
+
+    int32_t width = 0;
+    int32_t height = 0;
+    bool ready = false;
+};
+
+// Geometria: 3 vértices, intercalado [x, y, r, g, b] (triângulo em tons da app)
+static const GLfloat TRIANGLE_VERTICES[] = {
+    -0.6f, -0.5f,  1.00f, 0.45f, 0.10f,   // laranja
+     0.6f, -0.5f,  0.95f, 0.95f, 0.92f,   // branco
+     0.0f,  0.62f, 0.15f, 0.75f, 0.55f    // verde-água
+};
+
+// ── Assets: shaders em ficheiros separados ──────────────────────────────────
+
+static std::string readAsset(AAssetManager* assets, const char* path) {
+    if (assets == nullptr) {
+        LOGE("AAssetManager nulo — não é possível ler %s", path);
+        return "";
+    }
+    AAsset* asset = AAssetManager_open(assets, path, AASSET_MODE_BUFFER);
+    if (asset == nullptr) {
+        LOGE("Asset não encontrado: %s", path);
+        return "";
+    }
+    const off_t length = AAsset_getLength(asset);
+    std::string out;
+    out.resize(static_cast<size_t>(length));
+    AAsset_read(asset, out.data(), static_cast<size_t>(length));
+    AAsset_close(asset);
+    LOGI("Asset lido: %s (%ld bytes)", path, static_cast<long>(length));
+    return out;
+}
+
+// ── Compilação de shaders ───────────────────────────────────────────────────
+
+static GLuint compileShader(GLenum type, const std::string& source) {
+    GLuint shader = glCreateShader(type);
+    const GLchar* text = source.c_str();
+    const GLint   length = static_cast<GLint>(source.size());
+    glShaderSource(shader, 1, &text, &length);
+    glCompileShader(shader);
+
+    GLint compiled = GL_FALSE;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+    if (compiled != GL_TRUE) {
+        char log[1024];
+        GLsizei written = 0;
+        glGetShaderInfoLog(shader, sizeof(log), &written, log);
+        LOGE("Falha ao compilar shader (%u): %.*s",
+             static_cast<unsigned>(type), static_cast<int>(written), log);
+        glDeleteShader(shader);
+        return 0;
+    }
+    return shader;
+}
+
+static GLuint buildProgram(AAssetManager* assets) {
+    const std::string vsSource = readAsset(assets, "shaders/triangle.vert");
+    const std::string fsSource = readAsset(assets, "shaders/triangle.frag");
+    if (vsSource.empty() || fsSource.empty()) {
+        LOGE("Shaders em falta nos assets");
+        return 0;
+    }
+
+    const GLuint vs = compileShader(GL_VERTEX_SHADER, vsSource);
+    const GLuint fs = compileShader(GL_FRAGMENT_SHADER, fsSource);
+    if (vs == 0 || fs == 0) {
+        if (vs != 0) glDeleteShader(vs);
+        if (fs != 0) glDeleteShader(fs);
+        return 0;
+    }
+
+    const GLuint program = glCreateProgram();
+    glAttachShader(program, vs);
+    glAttachShader(program, fs);
+    glLinkProgram(program);
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
+    GLint linked = GL_FALSE;
+    glGetProgramiv(program, GL_LINK_STATUS, &linked);
+    if (linked != GL_TRUE) {
+        char log[1024];
+        GLsizei written = 0;
+        glGetProgramInfoLog(program, sizeof(log), &written, log);
+        LOGE("Falha ao ligar programa: %.*s", static_cast<int>(written), log);
+        glDeleteProgram(program);
+        return 0;
+    }
+    return program;
+}
+
+// ── Ciclo de vida do ecrã (EGL + GLES) ──────────────────────────────────────
+
+static void engineInitDisplay(Engine* engine) {
+    engine->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if (engine->display == EGL_NO_DISPLAY) {
+        LOGE("eglGetDisplay falhou");
+        return;
+    }
+    if (!eglInitialize(engine->display, nullptr, nullptr)) {
+        LOGE("eglInitialize falhou");
+        return;
+    }
+
+    const EGLint configAttribs[] = {
+        EGL_SURFACE_TYPE,    EGL_WINDOW_BIT,
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
+        EGL_RED_SIZE,   8,
+        EGL_GREEN_SIZE, 8,
+        EGL_BLUE_SIZE,  8,
+        EGL_ALPHA_SIZE, 8,
+        EGL_NONE
+    };
+    EGLConfig config = nullptr;
+    EGLint numConfigs = 0;
+    if (!eglChooseConfig(engine->display, configAttribs, &config, 1, &numConfigs) ||
+        numConfigs < 1) {
+        LOGE("eglChooseConfig falhou (configs=%d)", static_cast<int>(numConfigs));
+        return;
+    }
+
+    const EGLint contextAttribs[] = { EGL_CONTEXT_CLIENT_VERSION, 3, EGL_NONE };
+    engine->context = eglCreateContext(engine->display, config,
+                                       EGL_NO_CONTEXT, contextAttribs);
+    engine->surface = eglCreateWindowSurface(engine->display, config,
+                                             engine->app->window, nullptr);
+    if (engine->context == EGL_NO_CONTEXT || engine->surface == EGL_NO_SURFACE) {
+        LOGE("eglCreateContext/Surface falhou (ctx=%p, surf=%p)",
+             reinterpret_cast<void*>(engine->context),
+             reinterpret_cast<void*>(engine->surface));
+        return;
+    }
+    if (!eglMakeCurrent(engine->display, engine->surface, engine->surface,
+                        engine->context)) {
+        LOGE("eglMakeCurrent falhou");
+        return;
+    }
+
+    eglQuerySurface(engine->display, engine->surface, EGL_WIDTH,  &engine->width);
+    eglQuerySurface(engine->display, engine->surface, EGL_HEIGHT, &engine->height);
+
+    engine->program = buildProgram(engine->app->activity->assetManager);
+    if (engine->program == 0) return;
+
+    // VAO + VBO intercalados (posição 2f + cor 3f = stride 20 bytes)
+    glGenVertexArrays(1, &engine->vao);
+    glGenBuffers(1, &engine->vbo);
+    glBindVertexArray(engine->vao);
+    glBindBuffer(GL_ARRAY_BUFFER, engine->vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(TRIANGLE_VERTICES),
+                 TRIANGLE_VERTICES, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
+                          5 * sizeof(GLfloat),
+                          reinterpret_cast<const void*>(0));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+                          5 * sizeof(GLfloat),
+                          reinterpret_cast<const void*>(2 * sizeof(GLfloat)));
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    glUseProgram(engine->program);
+    glClearColor(0.06f, 0.06f, 0.08f, 1.0f);
+
+    LOGI("GLES pronto: %s | %dx%d", glGetString(GL_VERSION),
+         static_cast<int>(engine->width), static_cast<int>(engine->height));
+    engine->ready = true;
+}
+
+static void engineDrawFrame(Engine* engine) {
+    if (!engine->ready) return;
+
+    glViewport(0, 0, engine->width, engine->height);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glBindVertexArray(engine->vao);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindVertexArray(0);
+
+    if (!eglSwapBuffers(engine->display, engine->surface)) {
+        LOGE("eglSwapBuffers falhou — a recolocar o ecrã");
+        engine->ready = false;
+    }
+}
+
+static void engineTermDisplay(Engine* engine) {
+    engine->ready = false;
+    if (engine->vbo != 0) { glDeleteBuffers(1, &engine->vbo);       engine->vbo = 0; }
+    if (engine->vao != 0) { glDeleteVertexArrays(1, &engine->vao);  engine->vao = 0; }
+    if (engine->program != 0) { glDeleteProgram(engine->program);   engine->program = 0; }
+
+    if (engine->display != EGL_NO_DISPLAY) {
+        eglMakeCurrent(engine->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+                       EGL_NO_CONTEXT);
+        if (engine->surface != EGL_NO_SURFACE) {
+            eglDestroySurface(engine->display, engine->surface);
+            engine->surface = EGL_NO_SURFACE;
+        }
+        if (engine->context != EGL_NO_CONTEXT) {
+            eglDestroyContext(engine->display, engine->context);
+            engine->context = EGL_NO_CONTEXT;
+        }
+        eglTerminate(engine->display);
+        engine->display = EGL_NO_DISPLAY;
+    }
+}
+
+// ── Eventos do native_app_glue ──────────────────────────────────────────────
+
+static void handleCmd(struct android_app* app, int32_t cmd) {
+    auto* engine = static_cast<Engine*>(app->userData);
+    switch (cmd) {
+        case APP_CMD_INIT_WINDOW:
+            LOGI("Janela disponível — a inicializar EGL/GLES");
+            engineInitDisplay(engine);
+            break;
+        case APP_CMD_TERM_WINDOW:
+            LOGI("Janela terminada — a libertar EGL/GLES");
+            engineTermDisplay(engine);
+            break;
+        case APP_CMD_GAINED_FOCUS:
+        case APP_CMD_LOST_FOCUS:
+            // Sem pausa de render: o loop continua (o swap é que dita o ritmo)
+            break;
+        default:
+            break;
+    }
+}
+
+// ── Ponto de entrada nativo ─────────────────────────────────────────────────
+
+extern "C" void android_main(struct android_app* app) {
+    Engine engine;
+    engine.app = app;
+    app->userData = &engine;
+    app->onAppCmd = handleCmd;
+
+    LOGI("android_main: GameActivity + native_app_glue + GLES 3.0");
+
+    while (true) {
+        int ident = 0;
+        int events = 0;
+        struct android_poll_source* source = nullptr;
+
+        // Com ecrã pronto: timeout 0 (render contínuo). Sem ecrã: bloqueia.
+        while ((ident = ALooper_pollAll(engine.ready ? 0 : -1, nullptr, &events,
+                                        reinterpret_cast<void**>(&source))) >= 0) {
+            if (source != nullptr) {
+                source->process(app, source);
+            }
+            if (app->destroyRequested != 0) {
+                LOGI("destroyRequested — saída limpa");
+                engineTermDisplay(&engine);
+                return;
+            }
+        }
+
+        engineDrawFrame(&engine);
+    }
+}

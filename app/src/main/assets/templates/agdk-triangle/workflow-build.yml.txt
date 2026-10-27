@@ -1,0 +1,45 @@
+name: Build (arm64-v8a, APK debug)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Gradle + CMake (arm64-v8a debug)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # Cache do Gradle (dependências + outputs) — acelera builds seguintes
+      - name: Gradle (com cache)
+        uses: gradle/actions/setup-gradle@v4
+
+      # Cache do NDK instalado pelo AGP (o download é pesado na primeira build)
+      - name: Cache NDK
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/
+          key: ndk-27.0.12077973-arm64
+          restore-keys: ndk-
+
+      - name: Permissões do wrapper
+        run: chmod +x gradlew
+
+      - name: Compilar APK debug (arm64-v8a)
+        run: ./gradlew :app:assembleDebug --stacktrace
+
+      - name: Publicar APK debug
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

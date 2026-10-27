@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-      Sem permissões perigosas: projetos no armazenamento privado da app,
-      pastas externas apenas via SAF (DocumentFile).
+      Permissões mínimas:
+      - INTERNET: só para o "Compilar na nuvem" (opcional, offline-first mantém-se);
+      - REQUEST_INSTALL_PACKAGES: instalar o APK gerado no GitHub Actions.
+      Projetos no armazenamento privado da app; pastas externas apenas via SAF.
     -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:name=".CppStudioApp"
@@ -53,6 +59,22 @@
         <activity
             android:name=".docs.DocsActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".cloud.CloudBuildActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Partilha segura do APK gerado (instalação) -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

@@ -112,7 +112,8 @@ class MainActivity : AppCompatActivity() {
             R.id.tplConsole to ProjectTemplates.Template.CPP_CONSOLE,
             R.id.tplCMakeMulti to ProjectTemplates.Template.CPP_CMAKE_MULTI,
             R.id.tplStaticLib to ProjectTemplates.Template.CPP_STATIC_LIB,
-            R.id.tplC to ProjectTemplates.Template.C_SINGLE_FILE
+            R.id.tplC to ProjectTemplates.Template.C_SINGLE_FILE,
+            R.id.tplAgdk to ProjectTemplates.Template.AGDK_TRIANGLE
         )
 
         MaterialAlertDialogBuilder(this)

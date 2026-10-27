@@ -10,10 +10,10 @@ Legenda: ✅ implementado · 🟡 parcialmente implementado · ⬜ pendente
 | 4 | Compilador C/C++ local (clang empacotado em jniLibs) | ⬜ Estratégia documentada em `docs/TOOLCHAIN-STRATEGY.md`; `ToolchainManager` já reporta estado real |
 | 5 | CMake local multi-ficheiro | ⬜ |
 | 6 | Gestor de bibliotecas | ⬜ |
-| 7 | Templates SDL2/SDL3 + OpenGL ES | ⬜ |
+| 7 | Templates SDL2/SDL3 + OpenGL ES + **build na nuvem** | 🟡 Template AGDK (GameActivity + GLES 3.0) com CI próprio; fluxo “Compilar na nuvem” completo (push via API, monitorização, log de erros, instalação do APK) — ver `docs/CLOUD-BUILD.md`; faltam SDL2/SDL3 |
 | 8 | Vulkan (módulo independente) | ⬜ |
 | 9 | Preparação Linux/OpenGL desktop | ⬜ |
-| 10 | Builds remotos opcionais (APK via GitHub Actions a partir da app) | 🟡 Workflows prontos no repo; integração na app na ETAPA 10 |
+| 10 | Builds remotos opcionais (APK via GitHub Actions a partir da app) | 🟡 Fluxo integrado na app para projetos AGDK (token encriptado, monitorização, instalação); generalizar aos restantes templates |
 | 11 | Testes de estabilidade/desempenho/segurança | 🟡 Testes unitários JVM do núcleo; testes de integração pendentes |
 | 12 | Documentação final e limitações conhecidas | 🟡 Em evolução |
 
@@ -29,6 +29,7 @@ Legenda: ✅ implementado · 🟡 parcialmente implementado · ⬜ pendente
 8. Executar o programa localmente — ⬜ ETAPA 4
 9. Continuar a funcionar com a Internet desligada — ✅
 10. Gerar APK de release via GitHub Actions — ✅ (workflow pronto; ver docs/BUILD.md)
+11. Primeiro teste de OpenGL ES no telemóvel (template AGDK + build na nuvem + instalar APK) — 🟡 pronto a validar no dispositivo
 
 ## Limitações conhecidas (honestidade primeiro)
 
@@ -38,3 +39,6 @@ Legenda: ✅ implementado · 🟡 parcialmente implementado · ⬜ pendente
 - O realce de sintaxe é desativado automaticamente em ficheiros > 300 000 caracteres
   (proteção de desempenho), com aviso visível na UI.
 - Bracket matching não considera contexto de strings/comentários (limitação documentada).
+- “Compilar na nuvem”: repos criados são públicos (Actions grátis); push é snapshot integral
+  (1 commit por build); o código nativo do template AGDK só é validado no Actions do repo
+  gerado — os riscos completos estão em `docs/CLOUD-BUILD.md`.
